@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Platforms>x64</Platforms>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <RootNamespace>sirNugg3ts.HtmlToOmt</RootNamespace>
+
+    <PackageId>sirNugg3ts.HtmlToOmt</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Diogo Pascoal</Authors>
+    <Copyright>Copyright (c) 2026 Diogo Pascoal</Copyright>
+    <Description>Renders an HTML page offscreen via Chromium (CefSharp) and presents a live video source over OMT (Open Media Transport).</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/sirNugg3ts/HtmlToOmt</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/sirNugg3ts/HtmlToOmt</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>omt;cefsharp;html;chromium;video</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CefSharp.OffScreen.NETCore" Version="149.0.40">
+      <PrivateAssets>contentfiles;analyzers</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="libs\Winx64\libomt.dll" Link="libomt.dll" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="runtimes/win-x64/native/libomt.dll" />
+    <None Include="libs\Winx64\libomtnet.dll" Link="libomtnet.dll" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="runtimes/win-x64/native/libomtnet.dll" />
+    <None Include="libs\Winx64\libvmx.dll" Link="libvmx.dll" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="runtimes/win-x64/native/libvmx.dll" />
+
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="LICENSE" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>
