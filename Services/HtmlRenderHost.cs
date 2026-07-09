@@ -14,6 +14,9 @@ public sealed class HtmlRenderHost : IDisposable
     private readonly HtmlRenderHostOptions _options;
     private readonly ChromiumWebBrowser _browser;
     private readonly OmtOutputService _omtOutput;
+    private readonly Timer? _resendTimer;
+    private RenderedFrame? _lastFrame;
+    private int _paintsSinceTick;
 
     #endregion
 
@@ -55,6 +58,15 @@ public sealed class HtmlRenderHost : IDisposable
         _browser.StatusMessage += OnStatusMessage;
         _browser.AddressChanged += OnAddressChanged;
         _browser.TitleChanged += OnTitleChanged;
+
+        if (!options.PaintOnChangeOnly)
+        {
+            // CEF only paints when page content changes, so a static page would leave the
+            // OMT feed silent. Repeat the last frame at the configured FPS whenever no
+            // fresh paint arrived, keeping the feed continuous for receivers.
+            var interval = TimeSpan.FromMilliseconds(1000.0 / Math.Max(1, options.Fps));
+            _resendTimer = new Timer(_ => ResendLastFrameIfIdle(), null, interval, interval);
+        }
     }
 
     #region Public events
@@ -139,6 +151,7 @@ public sealed class HtmlRenderHost : IDisposable
     public void Dispose()
     {
         lock (_instancesLock) { _instances.Remove(this); }
+        _resendTimer?.Dispose();
         _browser.Paint -= OnPaint;
         _browser.LoadingStateChanged -= OnLoadingStateChanged;
         _browser.ConsoleMessage -= OnConsoleMessage;
@@ -237,7 +250,26 @@ public sealed class HtmlRenderHost : IDisposable
 
         var pixels = new byte[size];
         Marshal.Copy(eventArgs.BufferHandle, pixels, 0, size);
-        FrameReady?.Invoke(this, new RenderedFrame(eventArgs.Width, eventArgs.Height, pixels));
+        var frame = new RenderedFrame(eventArgs.Width, eventArgs.Height, pixels);
+        _lastFrame = frame;
+        Interlocked.Increment(ref _paintsSinceTick);
+        FrameReady?.Invoke(this, frame);
+    }
+
+    private void ResendLastFrameIfIdle()
+    {
+        if (Interlocked.Exchange(ref _paintsSinceTick, 0) > 0)
+        {
+            return;
+        }
+
+        var frame = _lastFrame;
+        if (frame is null)
+        {
+            return;
+        }
+
+        FrameReady?.Invoke(this, frame);
     }
 }
 
