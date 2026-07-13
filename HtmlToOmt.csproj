@@ -19,6 +19,8 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>omt;cefsharp;html;chromium;video</PackageTags>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <IncludeSymbols>false</IncludeSymbols>
+    <IncludeSource>false</IncludeSource>
     <Title>sirNugg3ts.HtmlToOmt</Title>
   </PropertyGroup>
 
@@ -31,9 +33,6 @@
   <ItemGroup>
     <None Include="libs\Winx64\libomt.dll" Link="libomt.dll" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="runtimes/win-x64/native/libomt.dll" />
     <None Include="libs\Winx64\libvmx.dll" Link="libvmx.dll" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="runtimes/win-x64/native/libvmx.dll" />
-    <!-- libomtnet is a managed assembly: ship it under lib/ so consumers get a compile-time
-         reference and it is always copied to their output. runtimes/native is only reliable
-         for publish, not plain builds, which left consumers crashing on F5 runs. -->
     <None Include="libs\Winx64\libomtnet.dll" Link="libomtnet.dll" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="lib/net8.0-windows7.0/libomtnet.dll" />
 
     <None Include="README.md" Pack="true" PackagePath="\" />
