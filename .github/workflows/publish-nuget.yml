@@ -1,5 +1,9 @@
 name: Build and Publish NuGet Package
 
+permissions:
+  id-token: write
+  contents: read
+
 on:
   push:
     branches:
@@ -26,13 +30,25 @@ jobs:
 
       - name: Pack NuGet package
         run: |
-          dotnet pack HtmlToOmt.csproj -c Release --no-build -o ./artifacts \
-            /p:IncludeSymbols=false /p:IncludeSource=false
+          dotnet pack HtmlToOmt.csproj -c Release --no-build -o ./artifacts /p:IncludeSymbols=false /p:IncludeSource=false
+
+      - name: NuGet login (OIDC → temp API key)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Get package version
+        id: get-version
+        run: |
+          [xml]$csproj = Get-Content HtmlToOmt.csproj
+          $version = $csproj.Project.PropertyGroup.Version
+          if (-not $version) {
+            Write-Error 'Version element not found in HtmlToOmt.csproj'
+            exit 1
+          }
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "version=$version"
 
       - name: Publish package to NuGet
-        env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
         run: |
-          dotnet nuget push ./artifacts/*.nupkg \
-            --api-key $NUGET_API_KEY \
-            --source https://api.nuget.org/v3/index.json --skip-duplicate
+          dotnet nuget push "./artifacts/sirNugg3ts.HtmlToOmt.${{ steps.get-version.outputs.version }}.nupkg" --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
