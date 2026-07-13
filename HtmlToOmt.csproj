@@ -8,7 +8,7 @@
     <RootNamespace>sirNugg3ts.HtmlToOmt</RootNamespace>
 
     <PackageId>sirNugg3ts.HtmlToOmt</PackageId>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Authors>Diogo Pascoal</Authors>
     <Copyright>Copyright (c) 2026 Diogo Pascoal</Copyright>
     <Description>Renders an HTML page offscreen via Chromium (CefSharp) and presents a live video source over OMT (Open Media Transport).</Description>
@@ -30,8 +30,11 @@
 
   <ItemGroup>
     <None Include="libs\Winx64\libomt.dll" Link="libomt.dll" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="runtimes/win-x64/native/libomt.dll" />
-    <None Include="libs\Winx64\libomtnet.dll" Link="libomtnet.dll" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="runtimes/win-x64/native/libomtnet.dll" />
     <None Include="libs\Winx64\libvmx.dll" Link="libvmx.dll" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="runtimes/win-x64/native/libvmx.dll" />
+    <!-- libomtnet is a managed assembly: ship it under lib/ so consumers get a compile-time
+         reference and it is always copied to their output. runtimes/native is only reliable
+         for publish, not plain builds, which left consumers crashing on F5 runs. -->
+    <None Include="libs\Winx64\libomtnet.dll" Link="libomtnet.dll" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="lib/net8.0-windows7.0/libomtnet.dll" />
 
     <None Include="README.md" Pack="true" PackagePath="\" />
     <None Include="LICENSE" Pack="true" PackagePath="\" />

@@ -94,13 +94,17 @@ public sealed class HtmlRenderHost : IDisposable
             return;
         }
 
-        var baseDir = AppContext.BaseDirectory;
+       var dataDir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "HtmlToOmt");
+        Directory.CreateDirectory(dataDir);
+
         var settings = new CefSettings
         {
             WindowlessRenderingEnabled = true,
             LogSeverity = LogSeverity.Warning,
-            LogFile = Path.Combine(baseDir, "cef.log"),
-            RootCachePath = Path.Combine(baseDir, "CefCache"),
+            LogFile = Path.Combine(dataDir, "cef.log"),
+            RootCachePath = Path.Combine(dataDir, "CefCache"),
         };
         settings.CefCommandLineArgs.Add("no-sandbox");
 
